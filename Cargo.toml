@@ -1,0 +1,13 @@
+[package]
+name = "github_submodule_hook"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rocket = "0.5.0-rc.2"
+serde = "1.0.147"
+tokio = "1.21.2"
+anyhow = "1.0.66"
+octorust = "0.1.37"
