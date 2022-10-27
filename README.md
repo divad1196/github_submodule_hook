@@ -37,7 +37,13 @@ I also wanted a file that can be manually edited
 user1 = abcd
 ```
 
-You can define the tokens yourself or use the CLI (TODO)
+You can define the tokens yourself or use the CLI to add them:
+
+```bash
+github_submodule_hook config user add user1
+```
+
+
 
 ### Usage
 
@@ -45,5 +51,17 @@ user1 can now do the following query
 
 ```bash
 curl -X POST localhost:8000/update/<owner>/<repo>/<branch>/<submodule>/<hash>?token?abcd
+```
+
+
+
+
+
+### Misc
+
+For the CLI, I used `clap` with declaration. I needed to configure cargo
+
+```bash
+cargo add clap --features derive
 ```
 
