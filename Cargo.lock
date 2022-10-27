@@ -575,6 +575,7 @@ dependencies = [
  "octorust",
  "rocket",
  "serde",
+ "serde_json",
  "tokio",
 ]
 

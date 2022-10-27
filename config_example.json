@@ -1,0 +1,15 @@
+{
+    "user_file": "users.txt",
+    "token": "mytoken",
+    "permissions": {
+        "user1": {
+            "owner": {
+                "repo": {
+                    "branch": [
+                        "submodule1"
+                    ]
+                }
+            }
+        }
+    } 
+}
