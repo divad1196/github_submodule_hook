@@ -1,5 +1,5 @@
 use base64;
-use pbkdf2;
+use sha2::{Sha512, Digest};
 use uuid::Uuid;
 
 /*
@@ -12,7 +12,10 @@ pub fn get_token() -> String {
     Uuid::new_v4().to_string()
 }
 
-pub fn storable_token(token: &str) {
-
+pub fn storable_token(token: &str) -> String {
+    let mut hasher = Sha512::new();
+    hasher.update(token.as_bytes());
+    let res = hasher.finalize();
+    base64::encode(res)
 }
 

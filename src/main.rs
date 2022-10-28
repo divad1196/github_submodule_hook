@@ -80,6 +80,9 @@ async fn run_server(config: config::Config) -> Result<(), rocket::Error> {
 fn add_user(config: config::Config, username: &String) {
     println!("Adding user {}", username);
     let token = token::get_token();
+    println!("Here is your token, save it now for you won't see it again:\n{}", token);
+
+    let token = token::storable_token(&token);
     let mut file = std::fs::OpenOptions::new()
         .create(true)
         .write(true)
@@ -102,14 +105,14 @@ async fn main() -> Result<(), rocket::Error> {
     let config = config::Config::from_file(&cli.config).expect("error");
 
     match cli.command {
-        cli::Commands::server { port, host } => {
+        cli::Commands::Server { port, host } => {
             run_server(config).await?;
         },
-        cli::Commands::config { command } => {
+        cli::Commands::Config { command } => {
             match command {
-                cli::ConfigAction::user { command } => {
+                cli::ConfigAction::User { command } => {
                     match command {
-                        cli::ConfigUser::add { username } => add_user(config, &username)
+                        cli::ConfigUser::Add { username } => add_user(config, &username)
                     };
                 }
             };

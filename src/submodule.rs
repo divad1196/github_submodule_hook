@@ -83,6 +83,7 @@ pub struct SubmoduleUpdate {
 }
 
 impl SubmoduleUpdate {
+    #[allow(unused)]
     pub fn new(
         owner: &str,
         repo: &str,
@@ -98,6 +99,7 @@ impl SubmoduleUpdate {
             hash: hash.to_string(),
         }
     }
+    #[allow(unused)]
     pub async fn update_as(&self, client: &Client) -> Result<()> {
         update_submodule(
             client,

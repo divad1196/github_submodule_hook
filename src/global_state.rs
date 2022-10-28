@@ -1,5 +1,3 @@
-
-use serde_json;
 use octorust::Client;
 use crate::users;
 

@@ -3,6 +3,7 @@ use anyhow::Result;
 use std::io::BufRead;
 use serde::{Serialize, Deserialize};
 use std::collections::{HashMap, HashSet};
+use crate::token;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BranchPerm(HashSet<String>);
@@ -78,7 +79,7 @@ impl UserToken {
     }
     pub fn from_reader<R: BufRead>(reader: &mut R) -> Result<UserToken> {
         let mut text = "".to_string();
-        reader.read_to_string(&mut text);
+        reader.read_to_string(&mut text)?;
         return UserToken::from_str(&text);
     }
 }
@@ -91,6 +92,7 @@ pub struct PermissionRegistery {
 impl PermissionRegistery {
     #[allow(unused_variables)]
     pub fn allowed(&self, token: &str, owner: &str, repo: &str, branch: &str, submodule: &str) -> bool {
+        let token = token::storable_token(&token);
         let user = self.users.map.get(&token as &str);
         if let None = user {
             println!("No User found");
@@ -102,22 +104,3 @@ impl PermissionRegistery {
 
     }
 }
-
-/*{
-    "user_file": "users.txt",
-    "clients": {
-        "default": "mytoken"
-    },
-    "users": {
-        "user1": {
-            "owner": {
-                "repo": {
-                    "branch": [
-                        "submodule1"
-                    ]
-                }
-            }
-        }
-    } 
-}
-*/

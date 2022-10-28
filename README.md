@@ -55,6 +55,15 @@ curl -X POST localhost:8000/update/<owner>/<repo>/<branch>/<submodule>/<hash>?to
 
 
 
+### Choices
+
+### Token
+
+* UUID4: This is random and non deterministic, the size is great too.
+* SHA512: We don't need any password-specialized hash algorithm:
+  * The entropy of the token is good (which is not the case for human password), we don't need salt
+  * We don't need slow-by-design algorithm because of the number of possible values.
+
 
 
 ### Misc

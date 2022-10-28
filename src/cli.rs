@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use clap::{Parser, Subcommand};
 
 // https://docs.rs/clap/latest/clap/_derive/_tutorial/index.html
@@ -29,7 +27,7 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum ConfigUser {
-    add {
+    Add {
         /// username to add
         username: String,
     }
@@ -38,7 +36,7 @@ pub enum ConfigUser {
 
 #[derive(Subcommand, Debug)]
 pub enum ConfigAction {
-    user {
+    User {
         #[command(subcommand)]
         command: ConfigUser,
     }
@@ -47,11 +45,11 @@ pub enum ConfigAction {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Manage Config
-    config {
+    Config {
         #[command(subcommand)]
         command: ConfigAction,
     },
-    server {
+    Server {
         #[arg(short = 'p', long = "port", value_name = "PORT", default_value_t = 8000)]
         port: u16,
         #[arg(short = 'H', long = "host", value_name = "HOST", default_value_t = String::from("localhost"))]
