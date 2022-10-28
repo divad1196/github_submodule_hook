@@ -5,8 +5,13 @@ use anyhow::Result;
 use std::io::Read;
 use crate::users;
 
+fn default_user_file() -> String {
+    "users.txt".to_string()
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
+    #[serde(default = "default_user_file")]
     pub user_file: String,
     pub token: String,
     pub permissions: users::Permissions,

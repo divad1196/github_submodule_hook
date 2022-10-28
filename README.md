@@ -6,13 +6,28 @@ This service provide an API to update submodules to a specific SHA on a reposito
 
 ### Configuration
 
+The whole configuration is defined in the configuration file.
+The file is in JSON-format.
+
+It can be passed to the program with the `-c` option, otherwise, it will check the following places:
+
+* local file named `config.json`
+* (TODO) Environment variable `GITHUB_SUBMODULE_HOOK_CONFIG`
+* (TODO) `~/.github_submodule_hook/config.json`
+* (TODO) `/etc/github_submodule_hook`
+* (TODO) file `config.json` in the same directory as the executable
+
+
+
+
+
 **config.json**
 
 ```json
 {
-    "user_file": "users.txt",	// The file that contains the mapping "user = token"
-    "token": "mytoken",			// The token to access the github API (need enough permission)
-    "permissions": {			// Permisson tree: you give, for each user, access to different repository
+    "user_file": "users.txt",   // Optional: The file that contains the mapping "user = token"
+    "token": "mytoken",         // The token to access the github API (need enough permission)
+    "permissions": {            // Permisson tree: you give, for each user, access to different repository
         "user1": {
             "owner": {
                 "repo": {
@@ -33,15 +48,19 @@ I also wanted a file that can be manually edited
 
 **users.txt** (or the name you choose to use)
 
-```
-user1 = abcd
-```
-
-You can define the tokens yourself or use the CLI to add them:
+use the CLI to add them:
 
 ```bash
 github_submodule_hook config user add user1
 ```
+
+Nb: the file contains 1 entry by line in the following format
+
+```yaml
+{username} = {base64(sha512(token))}
+```
+
+You could generate your own token if you want but this is strongly discouraged.
 
 
 
