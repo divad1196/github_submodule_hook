@@ -74,7 +74,35 @@ curl -X POST localhost:8000/update/<owner>/<repo>/<branch>/<submodule>/<hash>?to
 
 
 
-### Choices
+## Build
+
+```bash
+cargo build --release --target=x86_64-unknown-linux-gnu
+```
+
+
+
+### Using [Cross](https://github.com/cross-rs/cross)
+
+This simplifies cross-build
+
+
+
+Install Cross
+
+```bash
+cargo install cross
+```
+
+Use it to build
+
+```bash
+cross build --target x86_64-unknown-linux-gnu --release
+```
+
+
+
+## Choices
 
 ### Token
 
