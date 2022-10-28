@@ -9,13 +9,14 @@ use clap::Parser;
 use global_state::GlobalState;
 use octorust::auth::Credentials;
 use octorust::Client;
-use std::io::{Write};
-
-// use rocket::config::{ConfigBuilder};
+use std::io::Write;
 
 #[macro_use]
 extern crate rocket;
 use rocket::State;
+
+// use rocket::config::{ConfigBuilder};
+const EXAMPLE_CONFIG: &str = std::include_str!("../config_example.json");
 
 #[post("/update/<owner>/<repo>/<branch>/<submodule>/<hash>?<token>")]
 async fn update(
@@ -45,7 +46,7 @@ async fn update(
     }
 }
 
-async fn run_server(config: config::Config) -> Result<(), rocket::Error> {
+async fn run_server(config: config::Config, port: Option<u16>, host: Option<String>) -> Result<(), rocket::Error> {
 
     let registry = users::PermissionRegistery {
         users: users::UserToken::from_file(&config.user_file).expect("Failed to load users"),
@@ -61,13 +62,19 @@ async fn run_server(config: config::Config) -> Result<(), rocket::Error> {
         client: client,
         permissions: registry,
     };
-/* 
-    let rocket_config = Config::
-        .address("localhost")
-        .port(8000)
-        .finalize()?;
-*/
-    let _rocket = rocket::build()  // ::custom(rocket_config)
+    
+    // https://rocket.rs/v0.5-rc/guide/configuration/#custom-providers
+    let mut figment = rocket::Config::figment();
+    if let Some(port) = port {
+        figment = figment.merge(("port", port));
+    }
+    if let Some(host) = host {
+        figment= figment.merge(("address", host));
+    }
+    // .merge(("limits", Limits::new().limit("json", 2.mebibytes())));
+    let figment = figment;
+
+    let _rocket = rocket::custom(figment)  // :
         .manage(state)
         .mount("/", routes![update])
         .launch()
@@ -93,27 +100,40 @@ fn add_user(config: config::Config, username: &String) {
     // config.user_file
 }
 
+fn make_config() {
+    let mut file = std::fs::OpenOptions::new().create_new(true).write(true).open("config.json").unwrap();
+    if let Err(e) = writeln!(file, "{}", EXAMPLE_CONFIG) {
+        eprintln!("Couldn't write to file: {}", e);
+    }
+}
+
 // https://api.rocket.rs/master/rocket/struct.Rocket.html
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
 
     let cli = cli::Cli::parse();
 
-    let config = config::Config::from_file(&cli.config).expect("error");
+    // Userfile is adjacent to config file
+    let config = cli.get_config();
+
 
     match cli.command {
         cli::Commands::Server { port, host } => {
-            run_server(config).await?;
+            run_server(config.unwrap(), port, host).await?;
         },
         cli::Commands::Config { command } => {
             match command {
                 cli::ConfigAction::User { command } => {
                     match command {
-                        cli::ConfigUser::Add { username } => add_user(config, &username)
+                        cli::ConfigUser::Add { username } => add_user(config.unwrap(), &username)
                     };
-                }
+                },
+                cli::ConfigAction::Make {  } => { make_config() }
             };
-        }
+        },
+        /*cli::Commands::Completion { shell } => {
+            println!("Sorry, this is currently not implemented");
+        }*/
     };
 
     Ok(())

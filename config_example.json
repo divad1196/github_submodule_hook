@@ -1,5 +1,4 @@
 {
-    "user_file": "users.txt",
     "token": "mytoken",
     "permissions": {
         "user1": {
