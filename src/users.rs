@@ -98,7 +98,6 @@ impl PermissionRegistery {
             println!("No User found");
             return false;
         }
-        println!("User found: {}", user.unwrap());
         
         self.permissions.allowed(user.unwrap(), &owner, &repo, &branch, &submodule)
 

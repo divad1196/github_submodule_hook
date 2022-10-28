@@ -51,8 +51,6 @@ async fn run_server(config: config::Config) -> Result<(), rocket::Error> {
         users: users::UserToken::from_file(&config.user_file).expect("Failed to load users"),
         permissions: config.permissions,
     };
-    println!("{:?}", registry.users);
-    println!("{:?}", registry.permissions);
 
     // https://api.rocket.rs/v0.4/rocket/struct.State.html
     let token = std::fs::read_to_string("token.txt").expect("File does not exists");
@@ -100,7 +98,6 @@ fn add_user(config: config::Config, username: &String) {
 async fn main() -> Result<(), rocket::Error> {
 
     let cli = cli::Cli::parse();
-    println!("{:?}", cli);
 
     let config = config::Config::from_file(&cli.config).expect("error");
 
