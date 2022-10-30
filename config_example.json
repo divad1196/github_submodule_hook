@@ -1,14 +1,28 @@
 {
     "token": "mytoken",
     "permissions": {
-        "user1": {
-            "owner": {
-                "repo": {
-                    "branch": [
-                        "submodule1"
+        "<user1>": {
+            "<owner>": {
+                "<repo>": {
+                    "<branch>": [
+                        "<submodule1>"
                     ]
                 }
             }
         }
-    } 
+    },
+    "hooks": {
+        "<owner>": {
+            "<repo>": {
+                "<branch>": [
+                    {
+                        "owner": "<owner-to-update>",
+                        "repo": "<repo-to-update>",
+                        "branch": "<branch-to-update>",
+                        "submodule": "<submodule-to-update>"
+                    }
+                ]
+            }
+        }
+    }
 }

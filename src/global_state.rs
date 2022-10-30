@@ -1,8 +1,9 @@
+use crate::hooks;
+use crate::access;
 use octorust::Client;
-use crate::users;
-
 
 pub struct GlobalState {
     pub client: Client,
-    pub permissions: users::PermissionRegistery,
+    pub permissions: access::users::PermissionRegistery,
+    pub hooks: hooks::hooks::HookRegistery,
 }

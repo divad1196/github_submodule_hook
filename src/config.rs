@@ -1,9 +1,10 @@
-
-use serde::{Serialize, Deserialize};
-use serde_json;
+use crate::hooks;
+use crate::access;
 use anyhow::Result;
-use std::io::Read;
-use crate::users;
+use serde::{Deserialize, Serialize};
+use serde_json;
+use std::io::{Read, Write};
+const EXAMPLE_CONFIG: &str = std::include_str!("../config_example.json");
 
 fn default_user_file() -> String {
     "users.txt".to_string()
@@ -14,7 +15,8 @@ pub struct Config {
     #[serde(default = "default_user_file")]
     pub user_file: String,
     pub token: String,
-    pub permissions: users::Permissions,
+    pub permissions: access::permissions::Permissions,
+    pub hooks: hooks::hooks::HookRegistery,
 }
 
 impl Config {
@@ -24,5 +26,16 @@ impl Config {
     }
     pub fn from_reader<R: Read>(reader: R) -> Result<Config> {
         Ok(serde_json::from_reader::<R, Config>(reader)?)
+    }
+}
+
+pub fn make_config() {
+    let mut file = std::fs::OpenOptions::new()
+        .create_new(true)
+        .write(true)
+        .open("config.json")
+        .unwrap();
+    if let Err(e) = writeln!(file, "{}", EXAMPLE_CONFIG) {
+        eprintln!("Couldn't write to file: {}", e);
     }
 }

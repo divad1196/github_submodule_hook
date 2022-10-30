@@ -10,6 +10,7 @@ edition = "2021"
 
 [dependencies]
 rocket = "0.5.0-rc.2"
+# rocket_contrib = "0.4.11"
 clap = { version = "4.0.18", features = ["derive"] }
 serde = "1.0.147"
 tokio = "1.21.2"

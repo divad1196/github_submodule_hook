@@ -1,5 +1,5 @@
 use base64;
-use sha2::{Sha512, Digest};
+use sha2::{Digest, Sha512};
 use uuid::Uuid;
 
 /*
@@ -18,4 +18,3 @@ pub fn storable_token(token: &str) -> String {
     let res = hasher.finalize();
     base64::encode(res)
 }
-

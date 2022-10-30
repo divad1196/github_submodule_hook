@@ -73,6 +73,15 @@ pub async fn update_submodule(
     Ok(())
 }
 
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SubmoduleUpdateData {
+    pub owner: String,
+    pub repo: String,
+    pub branch: String,
+    pub submodule: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SubmoduleUpdate {
     owner: String,
