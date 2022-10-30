@@ -28,16 +28,32 @@ It can be passed to the program with the `-c` option, otherwise, it will check t
     "user_file": "users.txt",   // Optional: The file that contains the mapping "user = token"
     "token": "mytoken",         // The token to access the github API (need enough permission)
     "permissions": {            // Permisson tree: you give, for each user, access to different repository
-        "user1": {
-            "owner": {
-                "repo": {
-                    "branch": [
-                        "submodule1"
+        "<user1>": {
+            "<owner>": {
+                "<repo>": {
+                    "<branch>": [
+                        "<submodule1>"
                     ]
                 }
             }
         }
-    } 
+    },
+    // Define the hooks and which repository to update
+    "hooks": {
+        "<owner>": {              // owner that triggered the hook
+            "<repo>": {           // repository that triggered the hook
+                "<branch>": [     // branch that triggered the hook
+                    // List of repository + branch + submodule to update
+                    {
+                        "owner": "<owner-to-update>",
+                        "repo": "<repo-to-update>",
+                        "branch": "<branch-to-update>",
+                        "submodule": "<submodule-to-update>"
+                    }
+                ]
+            }
+        }
+    }
 }
 ```
 
