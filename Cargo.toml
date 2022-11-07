@@ -2,6 +2,9 @@
 name = "github_submodule_hook"
 version = "0.1.1"
 edition = "2021"
+description = "A service that synchronise submodules with their source repository"
+repository = "https://github.com/divad1196/github_submodule_hook"
+homepage = "https://github.com/divad1196/github_submodule_hook"
 readme = "README.md"
 license-file = "LICENSE"
 
