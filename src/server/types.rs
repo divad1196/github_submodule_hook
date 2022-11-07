@@ -31,7 +31,7 @@ pub struct Json<T> {
 impl<'r, T: DeserializeOwned> FromData<'r> for Json<T> {
     type Error = anyhow::Error;
 
-    async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> Outcome<'r, Self> {
+    async fn from_data(_req: &'r Request<'_>, data: Data<'r>) -> Outcome<'r, Self> {
         // println!("{:?}", req.headers());
         match data_to_json(data).await {
             Ok(value) => match serde_json::from_value::<T>(value) {
@@ -51,7 +51,7 @@ pub struct OptionalJson<T> {
 impl<'r, T: DeserializeOwned> FromData<'r> for OptionalJson<T> {
     type Error = anyhow::Error;
 
-    async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> Outcome<'r, Self> {
+    async fn from_data(_req: &'r Request<'_>, data: Data<'r>) -> Outcome<'r, Self> {
         // println!("{:?}", req.headers());
         match data_to_json(data).await {
             Ok(value) => {
@@ -74,6 +74,7 @@ impl<'r, T: DeserializeOwned> FromData<'r> for OptionalJson<T> {
 pub struct JsonBody(pub serde_json::Value);
 
 impl JsonBody {
+    #[allow(unused)]
     pub fn print(&self) {
         println!("{}", serde_json::to_string_pretty(&self.0).unwrap());
     }

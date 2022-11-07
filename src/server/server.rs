@@ -45,6 +45,12 @@ async fn update(
     }
 }
 
+#[post("/")]
+async fn index() -> &'static str {
+    include_str!("../../index.html")
+}
+
+#[allow(unused)]
 #[post("/dev", format = "application/json", data = "<data>")]
 async fn dev(data: JsonBody) -> &'static str {
     data.print();
@@ -128,12 +134,12 @@ fn get_config(port: Option<u16>, host: Option<String>) ->  Figment {
 // https://stackoverflow.com/questions/39204908/how-to-check-release-debug-builds-using-cfg-in-rust
 #[cfg(debug_assertions)]
 fn get_routes() -> Vec<Route> {
-    routes![update, github_webhook, gitlab_webhook, dev]
+    routes![index, update, github_webhook, gitlab_webhook, dev]
 }
 
 #[cfg(not(debug_assertions))]
 fn get_routes() -> Vec<Route> {
-    routes![update, github_webhook, gitlab_webhook,]
+    routes![index, update, github_webhook, gitlab_webhook,]
 }
 
 pub async fn run_server(
