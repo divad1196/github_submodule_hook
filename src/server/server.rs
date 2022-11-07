@@ -1,6 +1,6 @@
 use octorust::auth::Credentials;
 use octorust::Client;
-use rocket::{State, Route};
+use rocket::{State, Route, response::content::RawHtml};
 use rocket::figment::Figment;
 
 use crate::config;
@@ -45,9 +45,11 @@ async fn update(
     }
 }
 
-#[post("/")]
-async fn index() -> &'static str {
-    include_str!("../../index.html")
+const INDEX_PAGE: &str = include_str!("../../index.html");
+
+#[get("/")]
+async fn index() -> RawHtml<&'static str> {
+    return RawHtml(INDEX_PAGE);
 }
 
 #[allow(unused)]
