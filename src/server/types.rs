@@ -36,13 +36,32 @@ impl<'r, T: DeserializeOwned> FromData<'r> for Json<T> {
         match data_to_json(data).await {
             Ok(value) => match serde_json::from_value::<T>(value) {
                 Ok(data) => Outcome::Success(Json::<T> { data }),
+                Err(e) => Outcome::Failure((rocket::http::Status::ExpectationFailed, anyhow!(e)))
+            },
+            Err(e) => Outcome::Failure((rocket::http::Status::ExpectationFailed, e))
+        }
+    }
+}
+
+pub struct OptionalJson<T> {
+    pub data: Option<T>,
+}
+
+#[rocket::async_trait]
+impl<'r, T: DeserializeOwned> FromData<'r> for OptionalJson<T> {
+    type Error = anyhow::Error;
+
+    async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> Outcome<'r, Self> {
+        println!("{:?}", req.headers());
+        match data_to_json(data).await {
+            Ok(value) => match serde_json::from_value::<T>(value) {
+                Ok(data) => Outcome::Success(OptionalJson::<T> { data: Some(data) }),
                 Err(e) => {
-                    return Outcome::Failure((rocket::http::Status::ExpectationFailed, anyhow!(e)));
+                    eprintln!("Deserialization error: {:?}", e);
+                    Outcome::Success(OptionalJson::<T> { data: None })
                 }
             },
-            Err(e) => {
-                return Outcome::Failure((rocket::http::Status::ExpectationFailed, e));
-            }
+            Err(e) => Outcome::Failure((rocket::http::Status::ExpectationFailed, e))
         }
     }
 }

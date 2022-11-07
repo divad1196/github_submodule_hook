@@ -1,5 +1,6 @@
 use serde;
 use serde::{Deserialize};
+use super::hooks::{self, HookTrigger};
 
 #[derive(Deserialize, Debug)]
 pub struct GithubWebhook {
@@ -19,4 +20,21 @@ pub struct GithubWebhookRepository {
 #[derive(Deserialize, Debug)]
 pub struct GithubWebhookRepositoryOwner {
     pub name: String,
+}
+
+
+impl hooks::ToHookTrigger for GithubWebhook {
+    fn as_hook_trigger(self) -> Option<hooks::HookTrigger> {
+        let branch = self.branch.strip_prefix("refs/heads/");
+        if let None = branch {
+            return None;
+        }
+        let branch = branch.unwrap().to_string();
+        Some(hooks::HookTrigger {
+            owner: self.repository.owner.name,
+            repo: self.repository.name,
+            branch: branch,
+            hash: self.hash,
+        })
+    }
 }

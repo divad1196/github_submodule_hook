@@ -34,3 +34,15 @@ impl HookRegistery {
         Some(&branchhook.unwrap().0)
     }
 }
+
+#[derive(Debug)]
+pub struct HookTrigger {
+    pub owner: String,
+    pub repo: String,
+    pub branch: String,
+    pub hash: String
+}
+
+pub trait ToHookTrigger {
+    fn as_hook_trigger(self) -> Option<HookTrigger>;
+}

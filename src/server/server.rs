@@ -5,10 +5,12 @@ use rocket::figment::Figment;
 
 use crate::config;
 use crate::global_state::GlobalState;
+use crate::hooks::hooks::ToHookTrigger;
 use crate::submodule;
 use crate::access;
-use crate::server::types::{Json, JsonBody};
+use crate::server::types::{OptionalJson, JsonBody};
 use crate::hooks::github::GithubWebhook;
+use crate::hooks::gitlab::GitlabWebhook;
 
 #[post("/update/<owner>/<repo>/<branch>/<submodule>/<hash>?<token>")]
 async fn update(
@@ -42,24 +44,42 @@ async fn update(
         }
     }
 }
-/*
-#[post("/github/webhook", format = "application/json", data = "<data>")]
-async fn github_webhook(data: Data<'_>) -> &'static str {
-    let json = match data_to_json(data).await {
-        Ok(d) => d,
-        Err(e) => {
-            return "error occured";
-        }
-    };
-    println!("{:?}", json);
-    "Ok"
-}*/
 
-#[post("/github/webhook2", format = "application/json", data = "<data>")]
-async fn github_webhook2(data: JsonBody) -> &'static str {
+#[post("/dev", format = "application/json", data = "<data>")]
+async fn dev(data: JsonBody) -> &'static str {
     data.print();
     "Ok"
 }
+
+
+#[post(
+    "/gitlab/webhook?<token>",
+    format = "application/json",
+    data = "<data>"
+)]
+async fn gitlab_webhook(
+    state: &State<GlobalState>,
+    data: OptionalJson<GitlabWebhook>,
+    token: Option<String>,
+) -> &'static str {
+    println!("{:?}", data.data);
+    if token.is_none() {
+        return "Missing token";
+    }
+    let token = token.unwrap();
+    println!("Token: {}", token);
+    if data.data.is_none() {
+        return "Nothing to do";
+    }
+
+    let trigger = data.data.unwrap().as_hook_trigger();
+    if let None = trigger {
+        return "Nothing to do"
+    }
+    let trigger = trigger.unwrap();
+    state.trigger_hooks(&token, trigger).await
+}
+
 #[post(
     "/github/webhook?<token>",
     format = "application/json",
@@ -67,7 +87,7 @@ async fn github_webhook2(data: JsonBody) -> &'static str {
 )]
 async fn github_webhook(
     state: &State<GlobalState>,
-    data: Json<GithubWebhook>,
+    data: OptionalJson<GithubWebhook>,
     token: Option<String>,
 ) -> &'static str {
     println!("{:?}", data.data);
@@ -77,47 +97,16 @@ async fn github_webhook(
     let token = token.unwrap();
     println!("Token: {}", token);
 
-    let data = data.data;
-
-    let hooks = state.hooks.get(
-        &data.repository.owner.name,
-        &data.repository.name,
-        &data.branch,
-    );
-    if let None = hooks {
-        return "Nothing to be done";
+    if data.data.is_none() {
+        return "Nothing to do";
     }
-    let hooks = hooks.unwrap();
-    println!("Hooks found {:?}", hooks);
 
-    let client = &state.client;
-
-    let token = access::token::storable_token(&token);
-    let user = state.permissions.users.map.get(&token as &str);
-    if let None = user {
-        println!("No User found");
-        return "No User found";
+    let trigger = data.data.unwrap().as_hook_trigger();
+    if let None = trigger {
+        return "Nothing to do"
     }
-    let user = user.unwrap();
-    for h in hooks {
-        let allowed =
-            state
-                .permissions
-                .permissions
-                .allowed(user, &h.owner, &h.repo, &h.branch, &h.submodule);
-        if allowed {
-            let _result = submodule::update_submodule(
-                &client,
-                &h.owner,
-                &h.repo,
-                &h.branch,
-                &h.submodule,
-                &data.hash,
-            )
-            .await;
-        }
-    }
-    "Ok"
+    let trigger = trigger.unwrap();
+    state.trigger_hooks(&token, trigger).await
 }
 
 
@@ -160,7 +149,7 @@ pub async fn run_server(
     let figment = get_config(port, host);
     let _rocket = rocket::custom(figment) // :
         .manage(state)
-        .mount("/", routes![update, github_webhook, github_webhook2])
+        .mount("/", routes![update, github_webhook, gitlab_webhook, dev])
         .launch()
         .await?;
     Ok(())
