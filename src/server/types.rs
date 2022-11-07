@@ -32,7 +32,7 @@ impl<'r, T: DeserializeOwned> FromData<'r> for Json<T> {
     type Error = anyhow::Error;
 
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> Outcome<'r, Self> {
-        println!("{:?}", req.headers());
+        // println!("{:?}", req.headers());
         match data_to_json(data).await {
             Ok(value) => match serde_json::from_value::<T>(value) {
                 Ok(data) => Outcome::Success(Json::<T> { data }),
@@ -52,13 +52,16 @@ impl<'r, T: DeserializeOwned> FromData<'r> for OptionalJson<T> {
     type Error = anyhow::Error;
 
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> Outcome<'r, Self> {
-        println!("{:?}", req.headers());
+        // println!("{:?}", req.headers());
         match data_to_json(data).await {
-            Ok(value) => match serde_json::from_value::<T>(value) {
-                Ok(data) => Outcome::Success(OptionalJson::<T> { data: Some(data) }),
-                Err(e) => {
-                    eprintln!("Deserialization error: {:?}", e);
-                    Outcome::Success(OptionalJson::<T> { data: None })
+            Ok(value) => {
+                // println!("{}", serde_json::to_string_pretty(&value).unwrap());
+                match serde_json::from_value::<T>(value) {
+                    Ok(data) => Outcome::Success(OptionalJson::<T> { data: Some(data) }),
+                    Err(e) => {
+                        eprintln!("Deserialization error: {:?}", e);
+                        Outcome::Success(OptionalJson::<T> { data: None })
+                    }
                 }
             },
             Err(e) => Outcome::Failure((rocket::http::Status::ExpectationFailed, e))

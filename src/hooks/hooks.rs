@@ -46,3 +46,11 @@ pub struct HookTrigger {
 pub trait ToHookTrigger {
     fn as_hook_trigger(self) -> Option<HookTrigger>;
 }
+
+
+pub fn split_path_with_ns(path: &str) -> (String, String) {
+    match path.split_once("/") {
+        Some((owner, repo)) => (owner.to_owned(), repo.to_owned()),
+        None => ("".to_string(), path.to_string())
+    }
+}

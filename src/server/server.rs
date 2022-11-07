@@ -1,6 +1,6 @@
 use octorust::auth::Credentials;
 use octorust::Client;
-use rocket::State;
+use rocket::{State, Route};
 use rocket::figment::Figment;
 
 use crate::config;
@@ -124,6 +124,18 @@ fn get_config(port: Option<u16>, host: Option<String>) ->  Figment {
     figment
 }
 
+// dev route only available for development
+// https://stackoverflow.com/questions/39204908/how-to-check-release-debug-builds-using-cfg-in-rust
+#[cfg(debug_assertions)]
+fn get_routes() -> Vec<Route> {
+    routes![update, github_webhook, gitlab_webhook, dev]
+}
+
+#[cfg(not(debug_assertions))]
+fn get_routes() -> Vec<Route> {
+    routes![update, github_webhook, gitlab_webhook,]
+}
+
 pub async fn run_server(
     config: config::Config,
     port: Option<u16>,
@@ -141,7 +153,7 @@ pub async fn run_server(
     let creds = Credentials::Token(token);
     let client = Client::new("odoo-hook", creds).unwrap();
     let state = GlobalState {
-        client: client,
+        client,
         permissions: registry,
         hooks: config.hooks,
     };
@@ -149,7 +161,7 @@ pub async fn run_server(
     let figment = get_config(port, host);
     let _rocket = rocket::custom(figment) // :
         .manage(state)
-        .mount("/", routes![update, github_webhook, gitlab_webhook, dev])
+        .mount("/", get_routes())
         .launch()
         .await?;
     Ok(())

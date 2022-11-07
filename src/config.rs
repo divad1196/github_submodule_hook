@@ -1,5 +1,6 @@
 use crate::hooks;
 use crate::access;
+use crate::constants;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use serde_json;
@@ -33,7 +34,7 @@ pub fn make_config() {
     let mut file = std::fs::OpenOptions::new()
         .create_new(true)
         .write(true)
-        .open("config.json")
+        .open(constants::CONFIG_FILENAME)
         .unwrap();
     if let Err(e) = writeln!(file, "{}", EXAMPLE_CONFIG) {
         eprintln!("Couldn't write to file: {}", e);

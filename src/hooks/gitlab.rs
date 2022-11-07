@@ -1,6 +1,6 @@
 use serde;
 use serde::{Deserialize};
-use super::hooks::{self, HookTrigger};
+use super::hooks::{self, split_path_with_ns};
 
 #[derive(Deserialize, Debug)]
 pub struct GitlabWebhook {
@@ -27,13 +27,6 @@ pub struct GitlabWebhookObjectAttributes {
 #[derive(Deserialize, Debug)]
 pub struct GitlabWebhookObjectAttributesTarget {
     pub path_with_namespace: String,
-}
-
-fn split_path_with_ns(path: &str) -> (String, String) {
-    match path.split_once("/") {
-        Some((owner, repo)) => (owner.to_owned(), repo.to_owned()),
-        None => ("".to_string(), path.to_string())
-    }
 }
 
 
@@ -72,7 +65,7 @@ impl hooks::ToHookTrigger for GitlabWebhook {
                     None => {
                         return None;
                     }
-                }
+                };
                 Some(hooks::HookTrigger {
                     owner,
                     repo,

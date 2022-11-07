@@ -1,6 +1,15 @@
 # Github Submodule Hook
 
 This service provide an API to update submodules to a specific SHA on a repository.
+This can be triggered by:
+
+* Manual request (e.g. using `curl`)
+* Github webhooks:
+  * Push
+  * PR validation
+* Gitlab webhooks:
+  * Push
+  * PR validation
 
 
 
@@ -12,10 +21,10 @@ The file is in JSON-format.
 It can be passed to the program with the `-c` option, otherwise, it will check the following places:
 
 * local file named `config.json`
-* (TODO) Environment variable `GITHUB_SUBMODULE_HOOK_CONFIG`
-* (TODO) `~/.github_submodule_hook/config.json`
-* (TODO) `/etc/github_submodule_hook`
-* (TODO) file `config.json` in the same directory as the executable
+* Environment variable `GITHUB_SUBMODULE_HOOK_CONFIG`
+*  `~/.github_submodule_hook/config.json`
+*  `/etc/github_submodule_hook`
+* file `config.json` in the same directory as the executable
 
 
 
@@ -137,3 +146,14 @@ For the CLI, I used `clap` with declaration. I needed to configure cargo
 cargo add clap --features derive
 ```
 
+
+
+## Development
+
+* Expose the webhook using [ngrok](https://ngrok.com/)
+
+  ```bash
+  ngrok http 8000
+  ```
+
+  

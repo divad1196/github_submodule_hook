@@ -2,6 +2,7 @@ use anyhow::{anyhow, Result};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 // use clap_complete::{generate, Generator, Shell};
+use crate::constants;
 use crate::config;
 use home;
 
@@ -12,7 +13,7 @@ use home;
 pub struct Cli {
     /// Sets a custom config file
     #[arg(short = 'c', long = "config", value_name = "CONFIG")]
-    //  default_value_t = String::from("config.json")
+    //  default_value_t = String::from(constants::CONFIG_FILENAME)
     config: Option<String>,
 
     #[command(subcommand)]
@@ -88,7 +89,7 @@ impl Cli {
 
         // In current directory
         if let Ok(path) = std::env::current_dir() {
-            let config = path.join("config.json");
+            let config = path.join(constants::CONFIG_FILENAME);
             if config.exists() {
                 return Ok(config.to_str().unwrap().to_string());
             }
@@ -101,14 +102,14 @@ impl Cli {
 
         // In ~/.github_submodule_hook
         if let Some(path) = home::home_dir() {
-            let config = path.join(".github_submodule_hook").join("config.json");
+            let config = path.join(".github_submodule_hook").join(constants::CONFIG_FILENAME);
             if config.exists() {
                 return Ok(config.to_str().unwrap().to_string());
             }
         }
 
         // In /etc/github_submodule_hook
-        let config = PathBuf::from("/etc/github_submodule_hook/config.json");
+        let config = PathBuf::from("/etc/github_submodule_hook/").join(constants::CONFIG_FILENAME);
         if config.exists() {
             return Ok(config.to_str().unwrap().to_string());
         }
@@ -116,7 +117,7 @@ impl Cli {
         // Adjacent to executable
         if let Ok(path) = std::env::current_exe() {
             if let Some(parent_path) = path.parent() {
-                let config = parent_path.join("config.json");
+                let config = parent_path.join(constants::CONFIG_FILENAME);
                 if config.exists() {
                     return Ok(config.to_str().unwrap().to_string());
                 }

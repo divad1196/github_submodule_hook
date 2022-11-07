@@ -6,6 +6,7 @@ mod global_state;
 mod hooks;
 mod server;
 mod access;
+mod constants;
 
 use anyhow::Result;
 use clap::Parser;
